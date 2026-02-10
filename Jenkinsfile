@@ -44,13 +44,13 @@ pipeline {
                     reuseNode true
                     args '-u root:root'
                 }
-                steps {
+            }
+            steps {
                 sh '''
                     npm install serve
                     node_modules/.bin/serve -s build
                     npx playwrigth test
                 '''
-                }
             }
         }
     }
