@@ -30,7 +30,15 @@ pipeline {
                 }
             }
 
-             stage('E2E') {
+            steps {
+                sh '''
+                    #test -f build/index.html
+                    npm test
+                '''
+            }
+        }
+        
+        stage('E2E') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
@@ -46,11 +54,6 @@ pipeline {
                     npx playwright test
                 '''
             }
-        }
-        }
-        
-        stage('E2E'){
-
         }
     }
 
