@@ -29,6 +29,6 @@ pipeline {
                     npm test
                 '''
             }
-        })
+        }
     }
 }
