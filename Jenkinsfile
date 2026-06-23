@@ -76,16 +76,14 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Stagging E2E') {
+        stage('Deploy Staging E2E') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
             }
-            environment {
-                CI_ENVIRONMENT_URL = "STAGGING_URL_TO_BE_SET"
-            }
+
             steps {
                 sh '''
                     echo "Deployment"
@@ -93,8 +91,11 @@ pipeline {
                     node_modules/.bin/netlify --version
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir build --json > deploy-output.json
-                    CI_ENVIRONMENT_URL = "$(node_modules/.bin/node-jq -r ".deploy_url" deploy-output.json)"
-                    npx playwright test  --reporter=html
+
+                    export CI_ENVIRONMENT_URL="$(node_modules/.bin/node-jq -r ".deploy_url" deploy-output.json)"
+                    echo "Testing URL: $CI_ENVIRONMENT_URL"
+
+                    npx playwright test --reporter=html
                 '''
             }
 
