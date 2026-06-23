@@ -93,7 +93,7 @@ pipeline {
                     node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
                 '''
                 script {
-                    emv.MY_VAR = sh(script: ' node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json', returnStdout: true)
+                    emv.MY_VAR = sh(script: ' node_modules/.bin/node-jq -r ".deploy_url" deploy-output.json', returnStdout: true)
                 }
             }
         }
