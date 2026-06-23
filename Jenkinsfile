@@ -21,7 +21,7 @@ pipeline {
                 '''
             }
         }
-        stage("Test"{
+        stage("Test"){
             steps{
                 sh '''
                     echo "Starting test" 
