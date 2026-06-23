@@ -96,7 +96,8 @@ pipeline {
                         script: 'node_modules/.bin/node-jq -r ".deploy_url" deploy-output.json',
                         returnStdout: true
                     ).trim()
-                }
+                    echo "Deploy URL: ${env.MY_VAR}"
+                } 
             }
         }
         stage('STAGGING E2E') {
