@@ -90,14 +90,13 @@ pipeline {
                     node_modules/.bin/netlify --version
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir build --json >> deploy-output.json
-                    node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
                 '''
                 script {
                     emv.MY_VAR = sh(script: ' node_modules/.bin/node-jq -r ".deploy_url" deploy-output.json', returnStdout: true)
                 }
             }
         }
-          stage('STAGGING E2E') {
+        stage('STAGGING E2E') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
