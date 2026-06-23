@@ -76,12 +76,15 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Staging') {
+        stage('Deploy Stagging E2E') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
+            }
+            environment {
+                CI_ENVIRONMENT_URL = "STAGGING_URL_TO_BE_SET"
             }
             steps {
                 sh '''
@@ -90,29 +93,7 @@ pipeline {
                     node_modules/.bin/netlify --version
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir build --json > deploy-output.json
-                '''
-                script {
-                    env.MY_VAR = sh(
-                        script: 'node_modules/.bin/node-jq -r ".deploy_url" deploy-output.json',
-                        returnStdout: true
-                    ).trim()
-                    echo "Deploy URL: ${env.MY_VAR}"
-                } 
-            }
-        }
-        stage('STAGGING E2E') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                    reuseNode true
-                }
-            }
-            environment {
-                CI_ENVIRONMENT_URL = "${env.MY_VAR}"
-            }
-
-            steps {
-                sh '''
+                    CI_ENVIRONMENT_URL = "$(node_modules/.bin/node-jq -r ".deploy_url" deploy-output.json)"
                     npx playwright test  --reporter=html
                 '''
             }
@@ -130,23 +111,6 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Production') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    echo "Deployment"
-                    npm install netlify-cli@20.1.1
-                    node_modules/.bin/netlify --version
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir build --prod
-                '''
-            }
-        }
         stage('PROD E2E') {
             agent {
                 docker {
@@ -160,11 +124,15 @@ pipeline {
 
             steps {
                 sh '''
+                    echo "Deployment"
+                    npm install netlify-cli@20.1.1
+                    node_modules/.bin/netlify --version
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir build --prod
                     npx playwright test  --reporter=html
 
                 '''
             }
-
             post {
                 always {
                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML PROD Report', reportTitles: '', useWrapperFileDirectly: true])
