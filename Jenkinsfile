@@ -21,5 +21,14 @@ pipeline {
                 '''
             }
         }
+        stage("Test"{
+            steps{
+                sh '''
+                    echo "Starting test" 
+                    test -f "build/imdex.html"
+                    npm test
+                '''
+            }
+        })
     }
 }
